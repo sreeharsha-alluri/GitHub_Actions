@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Set job status as failed
-        if: ${{ success() }}  # Check if the previous step was successful
+        if: ${{ failure() }}  # Check if the previous step failed
         run: exit 1  # Exit with a failure status
 
       - name: Notify Build Status

@@ -27,7 +27,7 @@ jobs:
       - name: Simulate Error
         run: exit 1
         id: error
-        continue-on-error: true
+        #continue-on-error: true
 
       - name: Notify Build Status
         if: ${{ always() }}  # Ensure this step is always executed

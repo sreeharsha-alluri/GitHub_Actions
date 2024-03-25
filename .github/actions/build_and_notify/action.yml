@@ -34,6 +34,7 @@ runs:
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
     - name: Determine Job Status
+      shell: bash
       id: job_status
       run: |
         if [ -n "${{ steps.error }}" ]; then

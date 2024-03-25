@@ -28,7 +28,7 @@ jobs:
       - name: Simulate error
         run: exit 1
         id: error
-        
+
       - name: Deploy
         shell: bash
         run: |
@@ -39,7 +39,9 @@ jobs:
       - name: Determine Job Status
         id: job_status
         run: |
-          if [ "${{ env.BUILD_STATUS }}" -ne 0 ] || [ "${{ env.TEST_STATUS }}" -ne 0 ] || [ "${{ env.DEPLOY_STATUS }}" -ne 0 ]; then
+          if [ "${{ steps.error }} != null" ]; then
+            echo "FAIL"
+          elif [ "${{ env.BUILD_STATUS }}" -ne 0 ] || [ "${{ env.TEST_STATUS }}" -ne 0 ] || [ "${{ env.DEPLOY_STATUS }}" -ne 0 ]; then
             echo "FAIL"
           else
             echo "PASS"

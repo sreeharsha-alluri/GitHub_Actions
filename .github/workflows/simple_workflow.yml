@@ -17,10 +17,10 @@ jobs:
         shell: bash
         run: echo "Testing"
 
-      - name: Error
-        shell: bash
-        run: exit 1
-        id: error
+      #- name: Error
+      #  shell: bash
+      #  run: exit 1
+      #  id: error
        
       - name: Deploy
         shell: bash

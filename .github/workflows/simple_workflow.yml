@@ -24,7 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Simulate Error
+        run: exit 1
+        id: error
+        continue-on-error: true
+
       - name: Notify Build Status
+        if: ${{ always() }}  # Ensure this step is always executed
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -32,3 +38,4 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
+          status: ${{ steps.error.outputs.status }}  # Pass the status from Simulate Error step

@@ -1,4 +1,3 @@
-
 name: Simple Workflow
 
 on:
@@ -10,6 +9,9 @@ jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Build
         shell: bash
         run: echo "Building"
@@ -25,9 +27,6 @@ jobs:
       - name: Deploy
         shell: bash
         run: echo "Deploying"
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
       - name: Notify Build Status
         if: always()  # Ensure this step is always executed

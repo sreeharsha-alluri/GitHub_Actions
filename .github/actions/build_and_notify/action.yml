@@ -21,6 +21,7 @@ runs:
 
     - name: Get commit information
       id: commit_info
+      shell: bash
       run: |
         COMMIT_HASH=$(git rev-parse HEAD)
         BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)

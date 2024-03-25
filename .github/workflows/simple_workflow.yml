@@ -17,10 +17,11 @@ jobs:
         shell: bash
         run: echo "Testing"
 
-      - name: Deploy
+      - name: Error
         shell: bash
-        run: echo "Deploying"
-
+        #run: echo "Deploying"
+        run: exit 1
+        
       - name: Checkout repository
         if: always()
         uses: actions/checkout@v2

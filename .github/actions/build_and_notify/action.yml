@@ -33,6 +33,16 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
+    - name: Determine job status
+      id: determine_status
+      run: |
+        if [ ${{ failure() }} ]; then
+          echo "fail"
+        else
+          echo "pass"
+        fi
+      shell: bash
+
     - name: Send notification to Microsoft Teams
       shell: bash
       if: always()
@@ -51,7 +61,8 @@ runs:
         BUILD_NUMBER="${{ github.run_number }}"
         
         # Determine the job status
-        if [ -n "${{ steps.error }}" ]; then
+        STATUS=$(echo "${{ steps.determine_status.outputs.stdout }}" | tr -d '\n')
+        if [ "$STATUS" == "fail" ]; then
           status="FAIL ❌"
           color="attention"
           mentionedId="${{ inputs.error-mention-id }}"

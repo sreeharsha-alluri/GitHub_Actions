@@ -37,10 +37,7 @@ jobs:
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
 
-  handle-failure:
-    needs: build-test-deploy
-    runs-on: ubuntu-latest
-    if: ${{ needs.build-test-deploy.result != 'success' }}
-    steps:
-      - name: Set job status as failed
+      # Mark the job as failed if any step fails
+      - name: Handle Failure
+        if: ${{ failure() }}
         run: exit 1

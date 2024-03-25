@@ -37,7 +37,11 @@ jobs:
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
 
-      # Mark the job as failed if any step fails
-      - name: Handle Failure
-        if: ${{ failure() }}
-        run: exit 1
+    # Send failure notification if any step fails
+    post:
+      failure:
+        - name: Notify Failure
+          run: |
+            echo "Error encountered, marking the job as failed."
+            payload='{"text": "The job failed due to an error."}'
+            curl -X POST -H 'Content-type: application/json' --data "$payload" ${{ secrets.WEBHOOK_URL }}

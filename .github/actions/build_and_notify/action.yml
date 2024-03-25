@@ -1,5 +1,3 @@
-#Working Github Action Composite Action
-
 name: 'Build and Notify'
 description: 'Composite action for building and notifying'
 
@@ -35,6 +33,15 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
+    - name: Determine Job Status
+      id: job_status
+      run: |
+        if [ -n "${{ steps.error }}" ]; then
+          echo "FAIL"
+        else
+          echo "PASS"
+        fi
+
     - name: Send notification to Microsoft Teams
       run: |
         # Get the GitHub workflow run URL
@@ -51,7 +58,7 @@ runs:
         BUILD_NUMBER="${{ github.run_number }}"
         
         # Determine the job status
-        if [ -n "${{ steps.error }}" ]; then
+        if [ "${{ steps.job_status.outputs.status }}" == "FAIL" ]; then
           status="FAIL ❌"
           color="attention"
           mentionedId="${{ inputs.error-mention-id }}"

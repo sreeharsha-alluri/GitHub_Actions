@@ -22,17 +22,17 @@ jobs:
         shell: bash
         run: |
           echo "Testing"
-          # Perform your testing steps here
-          # If any command fails, the step will also fail
         env:
           TEST_STATUS: $?
 
+      - name: Simulate error
+        run: exit 1
+        id: error
+        
       - name: Deploy
         shell: bash
         run: |
           echo "Deploying"
-          # Perform your deployment steps here
-          # If any command fails, the step will also fail
         env:
           DEPLOY_STATUS: $?
 

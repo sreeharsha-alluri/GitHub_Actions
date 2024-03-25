@@ -1,4 +1,4 @@
-name: 'Build and Notify' 
+name: 'Build and Notify'
 description: 'Composite action for building and notifying'
 
 inputs:
@@ -34,10 +34,9 @@ runs:
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
     - name: Determine Job Status
-      shell: bash
       id: job_status
       run: |
-        if [ -n "${{ steps.error }}" ]; then
+        if [ ${{ failure() }} ]; then
           echo "FAIL"
         else
           echo "PASS"
@@ -60,10 +59,17 @@ runs:
         BUILD_NUMBER="${{ github.run_number }}"
         
         # Determine the job status
-        status="FAIL ❌"
-        color="attention"
-        mentionedId="${{ inputs.error-mention-id }}"
-        mentionedName="${{ inputs.error-mention-name }}"
+        if [ "${{ steps.job_status.outputs.job_status }}" == "FAIL" ]; then
+          status="FAIL ❌"
+          color="attention"
+          mentionedId="${{ inputs.error-mention-id }}"
+          mentionedName="${{ inputs.error-mention-name }}"
+        else
+          status="PASS ✅"
+          color="good"
+          mentionedId="${{ inputs.success-mention-id }}"
+          mentionedName="${{ inputs.success-mention-name }}"
+        fi
         
         # Generate the payload for the notification
         payload='{

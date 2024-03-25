@@ -22,10 +22,12 @@ runs:
   using: 'composite'
   steps:
     - name: Checkout code
+      if: always()
       uses: actions/checkout@v2
 
     - name: Get commit information
       id: commit_info
+      if: always()
       shell: bash
       run: |
         COMMIT_HASH=$(git rev-parse HEAD)

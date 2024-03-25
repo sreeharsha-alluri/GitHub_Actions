@@ -21,9 +21,9 @@ jobs:
         shell: bash
         run: echo "Deploying"
 
-      - name: Error
-        shell: bash
-        run: exit 1
+     # - name: Error
+     #   shell: bash
+     #  run: exit 1
 
       - name: Checkout repository
         if: always()

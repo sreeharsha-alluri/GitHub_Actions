@@ -21,6 +21,7 @@ jobs:
           exit 1  # Exit with a failure status
 
       - name: Checkout repository
+        if: always()
         uses: actions/checkout@v2
 
       - name: Call Build and Notify action

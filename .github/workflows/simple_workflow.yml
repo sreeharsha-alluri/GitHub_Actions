@@ -1,57 +1,30 @@
 name: Simple Workflow
-
+ 
 on:
   push:
     branches:
       - main
-
+ 
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Build
         shell: bash
-        run: |
-          echo "Building"
-          # Perform your build steps here
-          # If any command fails, the step will also fail
-        env:
-          BUILD_STATUS: $?
+        run: echo "Building"
 
       - name: Test
         shell: bash
-        run: |
-          echo "Testing"
-        env:
-          TEST_STATUS: $?
-
-      - name: Simulate error
-        run: exit 1
-        id: error
+        run: echo "Testing"
 
       - name: Deploy
         shell: bash
-        run: |
-          echo "Deploying"
-        env:
-          DEPLOY_STATUS: $?
-
-      - name: Determine Job Status
-        id: job_status
-        run: |
-          if [ "${{ steps.error }} != null" ]; then
-            echo "FAIL"
-          elif [ "${{ env.BUILD_STATUS }}" -ne 0 ] || [ "${{ env.TEST_STATUS }}" -ne 0 ] || [ "${{ env.DEPLOY_STATUS }}" -ne 0 ]; then
-            echo "FAIL"
-          else
-            echo "PASS"
-          fi
+        run: echo "Deploying"
 
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Notify Build Status
-        if: always()
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -59,4 +32,3 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
-          status: ${{ steps.job_status.outputs.status }}

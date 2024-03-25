@@ -17,6 +17,9 @@ inputs:
   success-mention-name:
     description: 'Name for mentioning in case of success'
     required: true
+  job-status:
+    description: 'Status of the job (success or failure)'
+    required: true
 
 runs:
   using: 'composite'
@@ -33,19 +36,9 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
-    - name: Determine job status
-      id: determine_status
-      run: |
-        if [ ${{ failure() }} ]; then
-          echo "fail"
-        else
-          echo "pass"
-        fi
-      shell: bash
-
     - name: Send notification to Microsoft Teams
       shell: bash
-      if: always()
+      if: ${{ inputs.job-status == 'failure' }}
       run: |
         # Get the GitHub workflow run URL
         JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -60,19 +53,11 @@ runs:
         # Get the build number
         BUILD_NUMBER="${{ github.run_number }}"
         
-        # Determine the job status
-        STATUS=$(echo "${{ steps.determine_status.outputs.stdout }}" | tr -d '\n')
-        if [ "$STATUS" == "fail" ]; then
-          status="FAIL ❌"
-          color="attention"
-          mentionedId="${{ inputs.error-mention-id }}"
-          mentionedName="${{ inputs.error-mention-name }}"
-        else
-          status="PASS ✅"
-          color="good"
-          mentionedId="${{ inputs.success-mention-id }}"
-          mentionedName="${{ inputs.success-mention-name }}"
-        fi
+        # Set the status to failure
+        status="FAIL ❌"
+        color="attention"
+        mentionedId="${{ inputs.error-mention-id }}"
+        mentionedName="${{ inputs.error-mention-name }}"
         
         # Generate the payload for the notification
         payload='{

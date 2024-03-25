@@ -19,9 +19,12 @@ jobs:
 
       - name: Error
         shell: bash
-        #run: echo "Deploying"
-        run: exit 1
-        
+        run: |
+          echo "Error encountered, marking the job as failed."
+          # Add any necessary error handling here
+          # You can also leave this step empty if no further action is required
+        if: failure()
+
       - name: Checkout repository
         if: always()
         uses: actions/checkout@v2

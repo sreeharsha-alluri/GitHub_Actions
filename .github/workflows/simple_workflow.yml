@@ -1,4 +1,6 @@
+
 name: Simple Workflow
+
 on:
   push:
     branches:
@@ -28,7 +30,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Notify Build Status
-        if: always()  
+        if: always()  # Ensure this step is always executed
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}

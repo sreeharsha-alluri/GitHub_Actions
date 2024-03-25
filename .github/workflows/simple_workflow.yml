@@ -17,11 +17,14 @@ jobs:
         shell: bash
         run: echo "Testing"
 
+      - name: Deploy
+        shell: bash
+        run: echo "Deploying"
+
       - name: Checkout repository
-        if: always()
         uses: actions/checkout@v2
 
-      - name: Run Composite Action
+      - name: Notify Build Status
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -29,4 +32,3 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
-          job-status: ${{ job.status }}

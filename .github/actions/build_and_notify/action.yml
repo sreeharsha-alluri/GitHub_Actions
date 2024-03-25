@@ -1,16 +1,23 @@
-name: 'Build and Notify' 
+#Working Github Action Composite Action
+
+name: 'Build and Notify'
 description: 'Composite action for building and notifying'
 
 inputs:
   webhook-url:
+    description: 'URL for Microsoft Teams webhook'
     required: true
   error-mention-id:
+    description: 'ID for mentioning in case of error'
     required: true
   error-mention-name:
+    description: 'Name for mentioning in case of error'
     required: true
   success-mention-id:
+    description: 'ID for mentioning in case of success'
     required: true
   success-mention-name:
+    description: 'Name for mentioning in case of success'
     required: true
 
 runs:
@@ -28,24 +35,7 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
-    - name: Determine job status
-      id: job_status
-      shell: bash
-      run: |
-        if [ -n "${{ steps.error }}" ]; then
-          echo "::set-output name=status::FAIL ❌"
-          echo "::set-output name=color::attention"
-          echo "::set-output name=mentionedId::${{ inputs.error-mention-id }}"
-          echo "::set-output name=mentionedName::${{ inputs.error-mention-name }}"
-        else
-          echo "::set-output name=status::PASS ✅"
-          echo "::set-output name=color::good"
-          echo "::set-output name=mentionedId::${{ inputs.success-mention-id }}"
-          echo "::set-output name=mentionedName::${{ inputs.success-mention-name }}"
-        fi
-
     - name: Send notification to Microsoft Teams
-      shell: bash
       run: |
         # Get the GitHub workflow run URL
         JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -60,11 +50,18 @@ runs:
         # Get the build number
         BUILD_NUMBER="${{ github.run_number }}"
         
-        # Get job status from previous step
-        STATUS=${{ steps.job_status.outputs.status }}
-        COLOR=${{ steps.job_status.outputs.color }}
-        MENTIONED_ID=${{ steps.job_status.outputs.mentionedId }}
-        MENTIONED_NAME=${{ steps.job_status.outputs.mentionedName }}
+        # Determine the job status
+        if [ -n "${{ steps.error }}" ]; then
+          status="FAIL ❌"
+          color="attention"
+          mentionedId="${{ inputs.error-mention-id }}"
+          mentionedName="${{ inputs.error-mention-name }}"
+        else
+          status="PASS ✅"
+          color="good"
+          mentionedId="${{ inputs.success-mention-id }}"
+          mentionedName="${{ inputs.success-mention-name }}"
+        fi
         
         # Generate the payload for the notification
         payload='{
@@ -77,53 +74,53 @@ runs:
                 "body": [
                   {
                     "type": "TextBlock",
-                    "text": "<at>'"$MENTIONED_NAME"'</at>",
-                    "color": "'"$COLOR"'"
+                    "text": "<at>'"$mentionedName"'</at>",
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Job Name:** Build and Notify",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Job URL:** [View Job]('"$JOB_URL"')",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
-                    "text": "**Status:** '"$STATUS"'",
-                    "color": "'"$COLOR"'"
+                    "text": "**Status:** '"$status"'",
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Repository URL:** '"$REPO_URL"'",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Build Number:** '"$BUILD_NUMBER"'",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Branch Name:** '"$BRANCH_NAME"'",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
                     "text": "**Latest Commit:** '"$COMMIT_HASH"'",
-                    "color": "'"$COLOR"'"
+                    "color": "'"$color"'"
                   }
                 ],
                 "msteams": {
                   "entities": [
                     {
                       "type": "mention",
-                      "text": "<at>'"$MENTIONED_NAME"'</at>",
+                      "text": "<at>'"$mentionedName"'</at>",
                       "mentioned": {
-                        "id": "'"$MENTIONED_ID"'",
-                        "name": "'"$MENTIONED_NAME"'"
+                        "id": "'"$mentionedId"'",
+                        "name": "'"$mentionedName"'"
                       }
                     }
                   ]
@@ -135,3 +132,4 @@ runs:
         
         # Send the payload to Microsoft Teams
         echo "$payload" | curl -X POST -H 'Content-Type: application/json' -d @- 'https://amdcloud.webhook.office.com/webhookb2/133d4f16-689b-4281-a94b-44725b948c77@3dd8961f-e488-4e60-8e11-a82d994e183d/IncomingWebhook/20c43fc799fd49e9813582813c638323/f9e22351-f1c9-494f-88c5-8e04accf2ffe'
+      shell: bash

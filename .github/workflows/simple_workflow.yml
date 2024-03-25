@@ -27,6 +27,7 @@ jobs:
 
 
       - name: Checkout repository
+        if: always()
         uses: actions/checkout@v2
 
       - name: Notify Build Status

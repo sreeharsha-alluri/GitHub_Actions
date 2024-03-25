@@ -33,6 +33,9 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
+    - name: Simulate error
+      run: exit 1
+
     - name: Send notification to Microsoft Teams
       run: |
         # Get the GitHub workflow run URL

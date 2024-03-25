@@ -21,9 +21,7 @@ jobs:
         shell: bash
         run: |
           echo "Error encountered, marking the job as failed."
-          # Add any necessary error handling here
-          # You can also leave this step empty if no further action is required
-        if: failure()
+          exit 1  # Exit with a failure status
 
       - name: Checkout repository
         if: always()
@@ -38,3 +36,11 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
+
+  handle-failure:
+    needs: build-test-deploy
+    runs-on: ubuntu-latest
+    if: ${{ needs.build-test-deploy.result != 'success' }}
+    steps:
+      - name: Set job status as failed
+        run: exit 1

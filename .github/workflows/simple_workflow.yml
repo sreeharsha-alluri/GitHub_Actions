@@ -8,6 +8,8 @@ on:
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
+    env:
+      JOB_STATUS: ''
     steps:
       - name: Build
         shell: bash
@@ -34,10 +36,10 @@ jobs:
         run: |
           if [ "${{ steps.error_step.outcome }}" == "failure" ]; then
             echo "FAIL ❌"
-            echo "::set-env name=JOB_STATUS::FAIL ❌"
+            echo "JOB_STATUS=FAIL ❌" >> $GITHUB_ENV
           else
             echo "PASS ✅"
-            echo "::set-env name=JOB_STATUS::PASS ✅"
+            echo "JOB_STATUS=PASS ✅" >> $GITHUB_ENV
           fi
         shell: bash
 
@@ -50,5 +52,3 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
-        env:
-          JOB_STATUS: ${{ steps.set_status.outputs.JOB_STATUS }}

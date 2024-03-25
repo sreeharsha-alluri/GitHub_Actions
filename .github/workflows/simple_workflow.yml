@@ -28,6 +28,19 @@ jobs:
         if: always()
         uses: actions/checkout@v2
         
+      - name: Set Job Status
+        if: always()
+        id: set_status
+        run: |
+          if [ "${{ steps.error_step.outcome }}" == "failure" ]; then
+            echo "FAIL ❌"
+            echo "::set-env name=JOB_STATUS::FAIL ❌"
+          else
+            echo "PASS ✅"
+            echo "::set-env name=JOB_STATUS::PASS ✅"
+          fi
+        shell: bash
+
       - name: Notify Build Status
         if: always()
         uses: ./.github/actions/build_and_notify
@@ -38,4 +51,4 @@ jobs:
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
         env:
-          JOB_STATUS: ${{ if(steps.error_step.outcome == 'failure', 'FAIL ❌', 'PASS ✅') }}
+          JOB_STATUS: ${{ steps.set_status.outputs.JOB_STATUS }}

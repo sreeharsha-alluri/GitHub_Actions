@@ -15,9 +15,7 @@ jobs:
 
       - name: Test
         shell: bash
-        run: |
-          # Simulate error
-          # exit 1
+        run: echo "Testing"
 
       - name: Deploy
         shell: bash

@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Notify Build Status
-        uses: ./.github/actions/build-and-notify
+        uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           error-mention-id: ${{ secrets.ERROR_MENTION_ID }}

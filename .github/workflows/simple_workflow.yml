@@ -14,9 +14,9 @@ jobs:
         shell: bash
         run: echo "Building"
 
-      #- name: Simulate Error
-      #  run: exit 1
-      #  id: error
+      - name: Simulate Error
+        run: exit 1
+        id: error
 
       - name: Test
         shell: bash

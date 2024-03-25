@@ -13,6 +13,10 @@ jobs:
         shell: bash
         run: echo "Building"
 
+      -  name: Simuate Error
+         run: exit 1
+         id: error
+         
       - name: Test
         shell: bash
         run: echo "Testing"

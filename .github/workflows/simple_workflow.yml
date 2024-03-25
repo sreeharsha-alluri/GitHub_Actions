@@ -8,43 +8,20 @@ on:
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
-    env:
-      JOB_STATUS: ''
     steps:
       - name: Build
         shell: bash
         run: echo "Building"
-        
+
       - name: Test
         shell: bash
         run: echo "Testing"
-        
-      - name: Error
-        id: error_step
-        shell: bash
-        run: |
-          echo "Error encountered, marking the job as failed."
-          exit 1  # Exit with a failure status
 
       - name: Checkout repository
         if: always()
         uses: actions/checkout@v2
-        
-      - name: Set Job Status
-        if: always()
-        id: set_status
-        run: |
-          if [ "${{ steps.error_step.outcome }}" == "failure" ]; then
-            echo "FAIL ❌"
-            echo "JOB_STATUS=FAIL ❌" >> $GITHUB_ENV
-          else
-            echo "PASS ✅"
-            echo "JOB_STATUS=PASS ✅" >> $GITHUB_ENV
-          fi
-        shell: bash
 
-      - name: Notify Build Status
-        if: always()
+      - name: Run Composite Action
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -52,3 +29,4 @@ jobs:
           error-mention-name: ${{ secrets.ERROR_MENTION_NAME }}
           success-mention-id: ${{ secrets.SUCCESS_MENTION_ID }}
           success-mention-name: ${{ secrets.SUCCESS_MENTION_NAME }}
+          job-status: ${{ job.status }}

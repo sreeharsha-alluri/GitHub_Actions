@@ -21,6 +21,11 @@ jobs:
         shell: bash
         run: echo "Deploying"
 
+      - name: Error
+        shell: bash
+        run: exit 1
+
+
       - name: Checkout repository
         uses: actions/checkout@v2
 

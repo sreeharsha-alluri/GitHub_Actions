@@ -1,10 +1,10 @@
 name: Simple Workflow
- 
+
 on:
   push:
     branches:
       - main
- 
+
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
@@ -15,7 +15,9 @@ jobs:
 
       - name: Test
         shell: bash
-        run: echo "Testing"
+        run: |
+          # Simulate error
+          exit 1
 
       - name: Deploy
         shell: bash
@@ -24,7 +26,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Determine Job Status
+        id: job_status
+        run: |
+          if [ -n "${{ steps.Test }}" ]; then
+            echo "FAIL"
+          else
+            echo "PASS"
+          fi
+
       - name: Notify Build Status
+        if: always()
         uses: ./.github/actions/build_and_notify
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}

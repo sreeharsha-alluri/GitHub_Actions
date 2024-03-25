@@ -11,31 +11,43 @@ jobs:
     steps:
       - name: Build
         shell: bash
-        run: echo "Building"
+        run: |
+          echo "Building"
+          # Perform your build steps here
+          # If any command fails, the step will also fail
+        env:
+          BUILD_STATUS: $?
 
       - name: Test
         shell: bash
-        run: echo "Testing"
+        run: |
+          echo "Testing"
+          # Perform your testing steps here
+          # If any command fails, the step will also fail
+        env:
+          TEST_STATUS: $?
 
       - name: Deploy
         shell: bash
-        run: echo "Deploying"
+        run: |
+          echo "Deploying"
+          # Perform your deployment steps here
+          # If any command fails, the step will also fail
+        env:
+          DEPLOY_STATUS: $?
+
+      - name: Determine Job Status
+        id: job_status
+        run: |
+          if [ "${{ env.BUILD_STATUS }}" -ne 0 ] || [ "${{ env.TEST_STATUS }}" -ne 0 ] || [ "${{ env.DEPLOY_STATUS }}" -ne 0 ]; then
+            echo "FAIL"
+          else
+            echo "PASS"
+          fi
 
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Use a separate step to capture the status of the job
-      - name: Determine Job Status
-        id: job_status
-        run: |
-          if [ ${{ failure() }} ]; then
-            echo "::set-output name=status::FAIL"
-          else
-            echo "::set-output name=status::PASS"
-          fi
-        continue-on-error: true
-
-      # Notify the build status based on the determined status
       - name: Notify Build Status
         if: always()
         uses: ./.github/actions/build_and_notify

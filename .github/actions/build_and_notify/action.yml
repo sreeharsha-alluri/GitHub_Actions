@@ -33,6 +33,15 @@ runs:
         echo "::set-output name=commit_hash::$COMMIT_HASH"
         echo "::set-output name=branch_name::$BRANCH_NAME"
 
+    - name: Determine status
+      id: check_status
+      run: |
+        if [ -n "${{ failure() }}" ]; then
+          echo "::set-output name=status::fail"
+        else
+          echo "::set-output name=status::pass"
+        fi
+
     - name: Send notification to Microsoft Teams
       if: always()
       run: |
@@ -50,7 +59,7 @@ runs:
         BUILD_NUMBER="${{ github.run_number }}"
         
         # Determine the job status
-        if [ -n "${{ steps.error }}" ]; then
+        if [ "${{ steps.check_status.outputs.status }}" == 'fail' ]; then
           status="FAIL ❌"
           color="attention"
           mentionedId="${{ inputs.error-mention-id }}"
@@ -131,4 +140,3 @@ runs:
         
         # Send the payload to Microsoft Teams
         echo "$payload" | curl -X POST -H 'Content-Type: application/json' -d @- 'https://amdcloud.webhook.office.com/webhookb2/133d4f16-689b-4281-a94b-44725b948c77@3dd8961f-e488-4e60-8e11-a82d994e183d/IncomingWebhook/20c43fc799fd49e9813582813c638323/f9e22351-f1c9-494f-88c5-8e04accf2ffe'
-      shell: bash

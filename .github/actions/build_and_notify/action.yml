@@ -17,6 +17,9 @@ inputs:
   success-mention-name:
     description: 'Name for mentioning in case of success'
     required: true
+  job-url:
+    description: 'URL of the GitHub workflow job'
+    required: true
 
 runs:
   using: 'composite'
@@ -39,19 +42,13 @@ runs:
       shell: bash
       if: always()
       run: |
-        # Get the GitHub workflow run URL
-        JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
+        # Get the job URL from input
+        JOB_URL=${{ inputs.job-url }}
+
         # Get the commit information from previous step
         COMMIT_HASH=${{ steps.commit_info.outputs.commit_hash }}
         BRANCH_NAME=${{ steps.commit_info.outputs.branch_name }}
-        
-        # Get the repository URL
-        REPO_URL="[${{ github.repository }}](${{ github.event.repository.html_url }})"
-        
-        # Get the build number
-        BUILD_NUMBER="${{ github.run_number }}"
-        
+
         # Determine the job status
         if [ -n "${{ steps.error }}" ]; then
           status="FAIL ❌"
@@ -64,7 +61,7 @@ runs:
           mentionedId="${{ inputs.success-mention-id }}"
           mentionedName="${{ inputs.success-mention-name }}"
         fi
-        
+
         # Generate the payload for the notification
         payload='{
           "type": "message",
@@ -96,12 +93,12 @@ runs:
                   },
                   {
                     "type": "TextBlock",
-                    "text": "**Repository URL:** '"$REPO_URL"'",
+                    "text": "**Repository URL:** [${{ github.repository }}](${{ github.event.repository.html_url }})",
                     "color": "'"$color"'"
                   },
                   {
                     "type": "TextBlock",
-                    "text": "**Build Number:** '"$BUILD_NUMBER"'",
+                    "text": "**Build Number:** ${{ github.run_number }}",
                     "color": "'"$color"'"
                   },
                   {
@@ -131,6 +128,6 @@ runs:
             }
           ]
         }'
-        
+
         # Send the payload to Microsoft Teams
         echo "$payload" | curl -X POST -H 'Content-Type: application/json' -d @- 'https://amdcloud.webhook.office.com/webhookb2/133d4f16-689b-4281-a94b-44725b948c77@3dd8961f-e488-4e60-8e11-a82d994e183d/IncomingWebhook/20c43fc799fd49e9813582813c638323/f9e22351-f1c9-494f-88c5-8e04accf2ffe'
